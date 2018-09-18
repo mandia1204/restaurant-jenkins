@@ -23,6 +23,7 @@ def call(Map pipelineParams) {
         }
         post {
             always {
+                step([$class: "TapPublisher", testResults: "report/test/test.out.tap", outputTapToConsole:false, enableSubtests:true ])
                 archiveArtifacts 'dist/**/*'
             }
         }
