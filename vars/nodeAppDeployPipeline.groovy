@@ -31,6 +31,7 @@ def call(Map pipelineParams) {
                 }
             }
             stage('Install dependencies') {
+                when { expression { return pipelineParams.skipInstallDependencies } }
                 steps {
                     script {
                         sh "(cd /${svcPath} ; npm install --production)"
