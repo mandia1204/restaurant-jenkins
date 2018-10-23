@@ -1,46 +1,39 @@
-import restaurant.util.PathUtil
+import restaurant.util.*
 
-def call(Map pipelineParams) {
+def call(Map params) {
     pipeline {
         agent any
-        tools {nodejs "localnode"}
         stages {
-            stage('Stop service') {
-                steps {
-                    sh "pm2 stop ${pipelineParams.serviceName}"
-                }
-            }
-            stage('Clean folder') {
+            stage('Copy last successful artifact to ws') {
                 steps {
                     script {
-                        //noinspection GroovyAssignabilityCheck
-                        svcPath = PathUtil.convertPath(pipelineParams.servicePath)
-                        sh "rm -rf /${svcPath}/*"
+                        sshUtil = new SSHUtil()
+                    }
+                    copyArtifacts fingerprintArtifacts: true, projectName: "${params.projectName}", selector: lastSuccessful()
+                }
+            }
+            stage('Publish artifact to server') {
+                steps {
+                    script {
+                        sshUtil.publish configName: 'kube-server', removePrefix: 'dist', sourceFiles:'dist/**', dir: "${params.appName}/dist"
                     }
                 }
             }
-            stage('Copy artifact') {
+            stage('Build and publish image') {
                 steps {
-                    copyArtifacts(projectName: "${pipelineParams.projectName}", target: "${pipelineParams.servicePath}")
                     script {
-                        def distPath = "/${svcPath}/dist"
-
-                        sh "[ -d ${distPath} ] && [ \"\$(ls -A ${distPath})\" ] && mv -v ${distPath}/* /${svcPath} || echo 'Nothing to copy!'"
-                        sh "rm -rf ${distPath}"
+                        imageTag = TagGenerator.generateImageTag("${env.BUILD_NUMBER}")
+                        def command = "/restaurant/deploy/./build-image.sh -t ${imageTag} -a ${params.appName}"
+                        sshUtil.publish configName: 'kube-server', command: command
                     }
                 }
             }
-            stage('Install dependencies') {
-                when { expression { return pipelineParams.skipInstallDependencies } }
+            stage('Update App in k8s') {
                 steps {
                     script {
-                        sh "(cd /${svcPath} ; npm install --production)"
+                        def command = "/restaurant/deploy/./update-app.sh -t ${imageTag} -a ${params.appName}"
+                        sshUtil.publish configName: 'kube-server', command: command
                     }
-                }
-            }
-            stage('Start service') {
-                steps {
-                    sh "pm2 start ${pipelineParams.serviceName}"
                 }
             }
         }
