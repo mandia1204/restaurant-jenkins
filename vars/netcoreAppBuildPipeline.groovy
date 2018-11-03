@@ -1,6 +1,6 @@
 def call(Map pipelineParams) {
     pipeline {
-        agent any
+        agent { label 'slave01' }
         stages {
             stage('Restore packages') {
                 steps {
