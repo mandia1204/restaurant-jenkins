@@ -1,7 +1,7 @@
 def call(Map pipelineParams) {
     pipeline {
-        agent any
-        tools {nodejs "node"}
+        agent { label 'slave01' }
+        tools {nodejs 'node'}
         stages {
             stage('Install dependencies') {
                 steps {
