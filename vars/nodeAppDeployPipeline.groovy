@@ -7,6 +7,7 @@ def call(Map params) {
             stage('Copy last successful artifact to ws') {
                 steps {
                     copyArtifacts fingerprintArtifacts: true, projectName: "${params.projectName}", selector: lastSuccessful()
+                    sh "mv ${env.WORKSPACE}/dist /home/jenkins/restaurant/${params.appName}"
                 }
             }
             stage('Build and publish image') {
