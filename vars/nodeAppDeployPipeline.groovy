@@ -7,14 +7,18 @@ def call(Map params) {
             stage('Copy last successful artifact to ws') {
                 steps {
                     copyArtifacts fingerprintArtifacts: true, projectName: "${params.projectName}", selector: lastSuccessful()
-                    sh "mv ${env.WORKSPACE}/dist /home/jenkins/restaurant/${params.appName}"
+                }
+            }
+            stage('Backup existing dist and copy new from ws') {
+                steps {
+                    sh "${env.HOME}/restaurant/deploy/./copy-artifact.sh -a ${params.appName} -w ${env.WORKSPACE}"
                 }
             }
             stage('Build and publish image') {
                 steps {
                     script {
                         imageTag = TagGenerator.generateImageTag("${env.BUILD_NUMBER}")
-                        sh "~/restaurant/deploy/./build-image.sh -t ${imageTag} -a ${params.appName}"
+                        sh "${env.HOME}/restaurant/deploy/./build-image.sh -t ${imageTag} -a ${params.appName}"
                     }
                 }
             }
