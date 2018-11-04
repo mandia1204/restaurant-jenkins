@@ -14,6 +14,8 @@ def call(Map params) {
                 steps {
                     script {
                         imageTag = TagGenerator.generateImageTag("${env.BUILD_NUMBER}")
+                        sh "pwd"
+                        sh "~/restaurant/deploy/./test.sh"
                         sh "~/restaurant/deploy/./build-image.sh -t ${imageTag} -a ${params.appName}"
                     }
                 }
