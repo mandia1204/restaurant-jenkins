@@ -14,6 +14,11 @@ def call(Map params) {
                     sh "${env.HOME}/restaurant/deploy/./copy-artifact.sh -a ${params.appName} -w ${env.WORKSPACE}"
                 }
             }
+            stage('Update docker file') {
+                steps {
+                    sh "cp ${env.WORKSPACE}/Dockerfile-Prod ${env.HOME}/restaurant/${params.appName}/Dockerfile"
+                }
+            }
             stage('Build and publish image') {
                 steps {
                     script {
