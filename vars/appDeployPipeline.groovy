@@ -29,10 +29,12 @@ def call(Map params) {
             }
             stage('Update App in k8s') {
                 steps {
-                    script {
-                        def command = "/home/matt/deploy/./deploy-app.sh -t ${imageTag} -a ${params.appName}"
-                        def sshUtil = new SSHUtil()
-                        sshUtil.publish configName: 'ansible', command: command
+                    ansiColor('xterm') {
+                        script {
+                            def command = "/home/matt/deploy/./deploy-app.sh -t ${imageTag} -a ${params.appName}"
+                            def sshUtil = new SSHUtil()
+                            sshUtil.publish configName: 'ansible', command: command
+                        }
                     }
                 }
             }
