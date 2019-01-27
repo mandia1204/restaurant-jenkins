@@ -30,9 +30,9 @@ def call(Map params) {
             stage('Update App in k8s') {
                 steps {
                     script {
-                        def command = "/restaurant/deploy/./update-app.sh -t ${imageTag} -a ${params.appName}"
+                        def command = "/home/matt/deploy/./deploy-app.sh -t ${imageTag} -a ${params.appName}"
                         def sshUtil = new SSHUtil()
-                        sshUtil.publish configName: 'kube-server', command: command
+                        sshUtil.publish configName: 'ansible', command: command
                     }
                 }
             }
