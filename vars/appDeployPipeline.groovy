@@ -31,7 +31,7 @@ def call(Map params) {
                 steps {
                     ansiColor('xterm') {
                         script {
-                            def command = "/home/matt/deploy/./deploy-app.sh -t ${imageTag} -a ${params.appName} --color=auto"
+                            def command = "/home/matt/deploy/./deploy-app.sh -t ${imageTag} -a ${params.appName}"
                             def sshUtil = new SSHUtil()
                             sshUtil.publish configName: 'ansible', command: command
                         }
