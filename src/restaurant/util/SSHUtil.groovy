@@ -17,7 +17,8 @@ def publish(Map params) {
                                     remoteDirectory: params.dir,
                                     remoteDirectorySDF: false,
                                     removePrefix: params.removePrefix,
-                                    sourceFiles: params.sourceFiles)
+                                    sourceFiles: params.sourceFiles,
+                                    usePty: true)
                     ],
                     usePromotionTimestamp: false,
                     useWorkspaceInPromotion: false,
