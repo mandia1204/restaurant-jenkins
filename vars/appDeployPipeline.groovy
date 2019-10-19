@@ -28,6 +28,7 @@ def call(Map params) {
                 }
             }
             stage('Update App in k8s') {
+                // calling ansible to run the playbook to deploy k8s app passing the imageTag.
                 steps {
                     ansiColor('xterm') {
                         script {
