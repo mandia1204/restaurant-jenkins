@@ -3,6 +3,9 @@ import restaurant.util.*
 def call(Map params) {
     pipeline {
         agent { label 'slave01' }
+        options {
+            timeout(time: 20, unit: 'MINUTES')
+        }
         stages {
             stage('Running stack') {
                 steps {
