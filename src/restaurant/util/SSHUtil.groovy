@@ -9,7 +9,7 @@ def publish(Map params) {
                                     cleanRemote: false,
                                     excludes: '',
                                     execCommand: params.command,
-                                    execTimeout: 120000,
+                                    execTimeout: 1200000,
                                     flatten: false,
                                     makeEmptyDirs: false,
                                     noDefaultExcludes: false,
