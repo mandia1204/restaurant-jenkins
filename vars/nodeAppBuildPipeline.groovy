@@ -27,6 +27,7 @@ def call(Map pipelineParams) {
                  steps {
                     ansiColor('xterm') {
                        sh 'npm run test'
+                       sh 'npm run tap-to-junit'
                     }
                  }
             }                
