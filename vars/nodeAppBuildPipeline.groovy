@@ -20,7 +20,9 @@ def call(Map pipelineParams) {
             }
             stage('Build') {
                  steps {
-                    sh 'npm run build'
+                    ansiColor('xterm') {
+                        sh 'npm run build'
+                    }
                  }
             }
             stage('Test') {
