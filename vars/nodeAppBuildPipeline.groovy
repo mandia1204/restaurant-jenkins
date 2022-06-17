@@ -1,25 +1,35 @@
 def call(Map pipelineParams) {
     pipeline {
-        podTemplate {
-            node("node-app-build") {
-                stage('Install dependencies') {
-                    steps {
-                        sh 'npm install'
-                    }
+        tools {nodejs 'node'}
+        agent {
+            kubernetes {
+                containerTemplate {
+                    name 'shell'
+                    image 'ubuntu'
+                    command 'sleep'
+                    args 'infinity'
                 }
-                stage('Build') {
-                    steps {
-                        sh 'npm run build'
-                    }
-                }
-                stage('Test') {
-                    steps {
-                        ansiColor('xterm') {
-                            sh 'npm run test'
-                        }
-                    }
-                }
+                defaultContainer 'shell'
             }
+        }
+        stages {
+            stage('Install dependencies') {
+                 steps {
+                    sh 'npm install'
+                 }
+            }
+            stage('Build') {
+                 steps {
+                    sh 'npm run build'
+                 }
+            }
+            stage('Test') {
+                 steps {
+                    ansiColor('xterm') {
+                       sh 'npm run test'
+                    }
+                 }
+            }                
         }
     }
 }
