@@ -1,31 +1,24 @@
 def call(Map pipelineParams) {
     pipeline {
-        agent { label 'slave01' }
-        tools {nodejs 'node'}
-        stages {
-            stage('Install dependencies') {
-                steps {
-                    sh 'npm install'
-                }
-            }
-            stage('Build') {
-                steps {
-                    sh 'npm run build'
-                }
-            }
-            stage('Test') {
-                steps {
-                    ansiColor('xterm') {
-                        sh 'npm run test'
+        podTemplate {
+            node("node-app-build") {
+                stage('Install dependencies') {
+                    steps {
+                        sh 'npm install'
                     }
                 }
-            }
-        }
-        post {
-            always {
-                step([$class: "TapPublisher", testResults: "report/test/test.out.tap", outputTapToConsole:false, enableSubtests:true ])
-                junit keepLongStdio: true, testResults: 'report/junit/*.xml'
-                archiveArtifacts 'dist/**/*'
+                stage('Build') {
+                    steps {
+                        sh 'npm run build'
+                    }
+                }
+                stage('Test') {
+                    steps {
+                        ansiColor('xterm') {
+                            sh 'npm run test'
+                        }
+                    }
+                }
             }
         }
     }
