@@ -1,38 +1,25 @@
 def call(Map pipelineParams) {
     pipeline {
+        agent { label 'slave01' }
         tools {nodejs 'node'}
-        agent {
-            kubernetes {
-                containerTemplate {
-                    name 'shell'
-                    image 'ubuntu'
-                    command 'sleep'
-                    args 'infinity'
-                }
-                defaultContainer 'shell'
-            }
-        }
         stages {
             stage('Install dependencies') {
-                 steps {
+                steps {
                     sh 'npm install'
-                 }
+                }
             }
             stage('Build') {
-                 steps {
-                    ansiColor('xterm') {
-                        sh 'npm run build'
-                    }
-                 }
+                steps {
+                    sh 'npm run build'
+                }
             }
             stage('Test') {
-                 steps {
+                steps {
                     ansiColor('xterm') {
-                       sh 'npm run test'
-                       sh 'npm run tap-to-junit'
+                        sh 'npm run test'
                     }
-                 }
-            }                
+                }
+            }
         }
         post {
             always {
