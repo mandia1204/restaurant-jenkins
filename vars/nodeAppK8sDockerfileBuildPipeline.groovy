@@ -11,12 +11,13 @@ def call(Map params) {
         stages {
             stage('Build image') {
                 steps {
+                    sh 'mkdir report'
                     sh 'ls -l'
                     ansiColor('xterm') {
                         script {
                             def imageTag = TagGenerator.generateImageTag("${env.BUILD_NUMBER}")
                             def customImage = docker.build("${params.repoName}:${imageTag}", ".") // add -f ${dockerfile} if we need a differnet docker file name
-                            customImage.inside('-v /home/jenkins/agent/workspace/restaurant-security-build_master/report:/output -u root') {
+                            customImage.inside('-v /home/jenkins/agent/workspace/restaurant-security-build_master/report:/output') {
                                 sh 'cp -R /var/www/report/* /output' // can see that test.html is generated
                                 sh 'ls -l /output'
                             }
