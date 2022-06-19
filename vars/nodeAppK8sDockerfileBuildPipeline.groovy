@@ -2,7 +2,7 @@ def call(Map pipelineParams) {
     pipeline {
         agent {
             kubernetes {
-                yaml readFile('k8s-podspec.yaml')
+                yamlFile 'k8s-podspec.yaml'
                 defaultContainer 'shell'
             }
         }
