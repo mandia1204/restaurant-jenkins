@@ -1,28 +1,21 @@
-def call(Map pipelineParams) {
+import restaurant.util.*
+
+def call(Map params) {
     pipeline {
         agent {
             kubernetes {
-                yamlFile 'k8s-podspec.yaml'
+                yamlFile 'k8s-jenkins-agent-pod.yaml'
                 defaultContainer 'shell'
             }
         }
-        // options {
-        //     // Because there's no way for the container to actually get at the git repo on the disk of the box we're running on.
-        //     skipDefaultCheckout(true)
-        // }
         stages {
             stage('Build image') {
                 steps {
                     sh 'ls -l'
                     script {
-                        def dockerfile = 'Dockerfile-dev'
-                        def customImage = docker.build("nodeapp:${env.BUILD_ID}", "-f ${dockerfile} .")
-
-                        customImage.inside {
-                            sh 'node -v'
-                        }
+                        def imageTag = TagGenerator.generateImageTag("${env.BUILD_NUMBER}")
+                        def customImage = docker.build("${params.repoName}:${imageTag}", ".") // add -f ${dockerfile} if we need a differnet docker file name
                     }
-                    sh 'docker version'
                 }
             }
         }
