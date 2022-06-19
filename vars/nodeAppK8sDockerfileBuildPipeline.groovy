@@ -22,6 +22,8 @@ def call(Map params) {
                             }
                         }
                     }
+                    sh 'ls -l'
+                    sh 'ls -l $WORKSPACE/report'
                 }
             }
         }
