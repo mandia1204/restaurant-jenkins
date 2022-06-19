@@ -25,7 +25,7 @@ def call(Map params) {
                     }
                     sh """
                     docker run --name tocopy -d -u root ${params.repoName}:${imageTag}
-                    docker cp tocopy:/var/www/report/* ./report
+                    docker cp tocopy:/var/www/report/ ./report
                     docker rm -f tocopy
                     """
                     sh 'ls -l'
