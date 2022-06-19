@@ -2,35 +2,13 @@ def call(Map pipelineParams) {
     pipeline {
         agent {
             kubernetes {
-                yaml '''
-apiVersion: v1
-kind: Pod
-spec:
-  nodeSelector:
-    kubernetes.io/hostname: k8s-node3
-  volumes:
-  - name: sock-volume
-    hostPath:
-      path: /var/run/docker.sock
-  containers:
-  - name: shell
-    imagePullPolicy: IfNotPresent
-    image: alpinelinux/docker-cli
-    volumeMounts:
-      - name: sock-volume
-        mountPath: /var/run/docker.sock
-    command:
-    - sleep
-    args:
-    - infinity
-'''
+                yaml readFile('k8s-podspec.yaml')
                 defaultContainer 'shell'
             }
         }
         stages {
             stage('Build image') {
                 steps {
-                    // checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'git-key', url: 'git@github.com:mandia1204/restaurant-security.git']]])
                     sh 'ls -l'
                     script {
                         def dockerfile = 'Dockerfile-dev'
