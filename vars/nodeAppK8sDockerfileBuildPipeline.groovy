@@ -11,7 +11,7 @@ def call(Map params) {
         stages {
             stage('Build image') {
                 steps {
-                    sh 'mkdir report'
+                    // sh 'mkdir report'
                     sh 'ls -l'
                     ansiColor('xterm') {
                         script {
@@ -25,7 +25,7 @@ def call(Map params) {
                     }
                     sh """
                     docker run --name tocopy -d -u root ${params.repoName}:${imageTag}
-                    docker cp tocopy:/var/www/report/ ./report
+                    docker cp tocopy:/var/www/report/ .
                     docker rm -f tocopy
                     """
                     sh 'ls -l'
