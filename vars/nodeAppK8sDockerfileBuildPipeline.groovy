@@ -25,12 +25,11 @@ def call(Map params) {
                 }
             }
         }
-        // post {
-        //     always {
-        //         step([$class: "TapPublisher", testResults: "report/test/test.out.tap", outputTapToConsole:false, enableSubtests:true ])
-        //         junit keepLongStdio: true, testResults: 'report/junit/*.xml'
-        //         archiveArtifacts 'dist/**/*'
-        //     }
-        // }
+        post {
+            always {
+                step([$class: "TapPublisher", testResults: "report/test/test.out.tap", outputTapToConsole:false, enableSubtests:true ])
+                junit keepLongStdio: true, testResults: 'report/junit/*.xml'
+            }
+        }
     }
 }
