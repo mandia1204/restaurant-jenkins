@@ -12,9 +12,11 @@ def call(Map params) {
             stage('Build image') {
                 steps {
                     sh 'ls -l'
-                    script {
-                        def imageTag = TagGenerator.generateImageTag("${env.BUILD_NUMBER}")
-                        def customImage = docker.build("${params.repoName}:${imageTag}", ".") // add -f ${dockerfile} if we need a differnet docker file name
+                    ansiColor('xterm') {
+                        script {
+                            def imageTag = TagGenerator.generateImageTag("${env.BUILD_NUMBER}")
+                            def customImage = docker.build("${params.repoName}:${imageTag}", ".") // add -f ${dockerfile} if we need a differnet docker file name
+                        }
                     }
                 }
             }
