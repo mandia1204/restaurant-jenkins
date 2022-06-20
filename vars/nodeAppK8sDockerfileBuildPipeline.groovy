@@ -43,15 +43,18 @@ def call(Map params) {
             stage('Updating image tag and pushing to git repo') {
                 steps {
                     container('git') {
-                        sh "git config --global --add safe.directory ${WORKSPACE}"
-                        sh 'git config --global user.email "mandia1204@gmail.com"'
-                        sh 'git config --global user.name "Marvin Andia"'
-                        sh 'git checkout main'
-                        sh "sed -i \"/${repoUser}\\/${repoAppName}:/c\\        image: ${imageName}\" ./${params.repoDir}/deployment.yml"
-                        sh 'git add .'
-                        sh "git commit -m \"Patching image to ${imageName}\""
-                        withCredentials([sshUserPrivateKey(credentialsId: 'git-key', keyFileVariable: 'SSH_KEY')]) {
-                            sh 'GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -i $SSH_KEY" git push origin main'
+                        checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'gitops']], userRemoteConfigs: [[credentialsId: 'git-key', url: 'git@github.com:mandia1204/argocd-configuration.git']]])
+                        dir("gitops") {
+                            sh "git config --global --add safe.directory ${WORKSPACE}/gitops"
+                            sh 'git config --global user.email "mandia1204@gmail.com"'
+                            sh 'git config --global user.name "Marvin Andia"'
+                            sh 'git checkout main'
+                            sh "sed -i \"/${repoUser}\\/${repoAppName}:/c\\        image: ${imageName}\" ./${params.repoDir}/deployment.yml"
+                            sh 'git add .'
+                            sh "git commit -m \"Patching image to ${imageName}\""
+                            withCredentials([sshUserPrivateKey(credentialsId: 'git-key', keyFileVariable: 'SSH_KEY')]) {
+                                sh 'GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -i $SSH_KEY" git push origin main'
+                            }
                         }
                     }
                 }
