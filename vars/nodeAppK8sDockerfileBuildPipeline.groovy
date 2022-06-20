@@ -15,15 +15,15 @@ def call(Map params) {
                         script {
                             imageTag = TagGenerator.generateImageTag("${env.BUILD_NUMBER}")
                             docker.build("${params.repoName}:${imageTag}", ".") // add -f ${dockerfile} if we need a differnet docker file name
+                            def tempContainerName = "tmp-copy-${env.BUILD_ID}"
+                            sh """
+                            echo 'extracting report and test files...'
+                            docker run --name ${tempContainerName}  -d ${params.repoName}:${imageTag} sleep 5000
+                            docker cp ${tempContainerName}:/var/www/report/ .
+                            docker rm -f ${tempContainerName}
+                            """
                         }
                     }
-                    def tempContainerName = "tmp-copy-${env.BUILD_ID}"
-                    sh """
-                    echo 'extracting report and test files...'
-                    docker run --name ${tempContainerName}  -d ${params.repoName}:${imageTag} sleep 5000
-                    docker cp ${tempContainerName}:/var/www/report/ .
-                    docker rm -f ${tempContainerName}
-                    """
                 }
             }
         }
