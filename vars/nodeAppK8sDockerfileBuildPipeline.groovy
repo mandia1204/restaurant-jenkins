@@ -14,7 +14,7 @@ def call(Map params) {
                     ansiColor('xterm') {
                         script {
                             imageTag = TagGenerator.generateImageTag("${env.BUILD_NUMBER}")
-                            imageName = "mandia1204/securityapp:${env.BUILD_ID}"
+                            imageName = "${params.repoName}:${imageTag}"
                             docker.build(imageName, ".") // add -f ${dockerfile} if we need a differnet docker file name
                             def tempContainerName = "tmp-copy-${env.BUILD_ID}"
                             sh """
