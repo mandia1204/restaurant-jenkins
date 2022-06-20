@@ -11,25 +11,19 @@ def call(Map params) {
         stages {
             stage('Build image') {
                 steps {
-                    // sh 'mkdir report'
-                    sh 'ls -l'
                     ansiColor('xterm') {
                         script {
                             imageTag = TagGenerator.generateImageTag("${env.BUILD_NUMBER}")
                             docker.build("${params.repoName}:${imageTag}", ".") // add -f ${dockerfile} if we need a differnet docker file name
-                            // customImage.inside('-v /home/jenkins/agent/workspace/restaurant-security-build_master/report:/output -u root') {
-                            //     sh 'cp -R /var/www/report/* /output'
-                            //     sh 'ls -l /output'
-                            // }
                         }
                     }
+                    def tempContainerName = "tmp-copy-${env.BUILD_ID}"
                     sh """
-                    docker run --name tocopy -d -u root ${params.repoName}:${imageTag}
-                    docker cp tocopy:/var/www/report/ .
-                    docker rm -f tocopy
+                    echo 'extracting report and test files...'
+                    docker run --name ${tempContainerName}  -d ${params.repoName}:${imageTag} sleep 5000
+                    docker cp ${tempContainerName}:/var/www/report/ .
+                    docker rm -f ${tempContainerName}
                     """
-                    sh 'ls -l'
-                    sh 'ls -l $WORKSPACE/report'
                 }
             }
         }
