@@ -14,15 +14,24 @@ def call(Map params) {
                     ansiColor('xterm') {
                         script {
                             imageTag = TagGenerator.generateImageTag("${env.BUILD_NUMBER}")
-                            docker.build("${params.repoName}:${imageTag}", ".") // add -f ${dockerfile} if we need a differnet docker file name
+                            imageName = "mandia1204/securityapp:${env.BUILD_ID}"
+                            docker.build(imageName, ".") // add -f ${dockerfile} if we need a differnet docker file name
                             def tempContainerName = "tmp-copy-${env.BUILD_ID}"
                             sh """
                             echo 'extracting report and test files...'
-                            docker run --name ${tempContainerName}  -d ${params.repoName}:${imageTag} sleep 5000
+                            docker run --name ${tempContainerName}  -d ${imageName} sleep 5000
                             docker cp ${tempContainerName}:/var/www/report/ .
                             docker rm -f ${tempContainerName}
                             """
                         }
+                    }
+                }
+            }
+            stage('Pushing image to registry') {
+                steps {
+                    withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'HUB_USER', passwordVariable: 'HUB_TOKEN')]) {                      
+                        sh 'echo $HUB_TOKEN | docker login -u $HUB_USER --password-stdin'
+                        sh "docker image push ${imageName}"
                     }
                 }
             }
