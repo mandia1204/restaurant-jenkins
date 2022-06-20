@@ -2,6 +2,9 @@ import restaurant.util.*
 
 def call(Map params) {
     pipeline {
+        options { 
+            buildDiscarder(logRotator(numToKeepStr: '10')) 
+        }
         agent {
             kubernetes {
                 yamlFile 'k8s-jenkins-agent-pod.yaml'
