@@ -40,7 +40,7 @@ def call(Map params) {
             stage('Updating image tag and pushing to git repo') {
                 steps {
                     container('git') {
-                        gitOpsPush workspace:env.WORKSPACE, repoUser:repoUser, repoAppName:repoAppName, repoDir:params.repoDir, imageName: imageName
+                        gitopsPush workspace:env.WORKSPACE, repoUser:repoUser, repoAppName:repoAppName, repoDir:params.repoDir, imageName: imageName
                     }
                 }
             }
