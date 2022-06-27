@@ -20,7 +20,12 @@ def call(Map params) {
                             imageName = "${params.repoName}:${imageTag}"
                             repoUser = params.repoName.split('/')[0];
                             repoAppName = params.repoName.split('/')[1];
-                            docker.build(imageName, ".")
+                            if(params.dockerFileName != null){
+                                docker.build(imageName, "-f ${params.dockerFileName} .")
+                            }else{
+                                docker.build(imageName, ".")
+                            }
+                            
                             if(params.appType == "node") {
                                 extractReportFolder buildId:env.BUILD_ID, imageName: imageName
                             }
