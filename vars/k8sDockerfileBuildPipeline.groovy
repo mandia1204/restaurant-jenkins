@@ -20,14 +20,10 @@ def call(Map params) {
                             imageName = "${params.repoName}:${imageTag}"
                             repoUser = params.repoName.split('/')[0];
                             repoAppName = params.repoName.split('/')[1];
-                            docker.build(imageName, ".") // add -f ${dockerfile} if we need a differnet docker file name
-                            def tempContainerName = "tmp-copy-${env.BUILD_ID}"
-                            sh """
-                            echo 'extracting report and test files...'
-                            docker run --name ${tempContainerName}  -d ${imageName} sleep 5000
-                            docker cp ${tempContainerName}:/var/www/report/ .
-                            docker rm -f ${tempContainerName}
-                            """
+                            docker.build(imageName, ".")
+                            if(params.appType == "node") {
+                                extractReportFolder buildId:env.BUILD_ID, imageName: imageName
+                            }
                         }
                     }
                 }
@@ -47,8 +43,12 @@ def call(Map params) {
         }
         post {
             always {
-                step([$class: "TapPublisher", testResults: "report/test/test.out.tap", outputTapToConsole:false, enableSubtests:true ])
-                junit keepLongStdio: true, testResults: 'report/junit/*.xml'
+                script {
+                    if(params.appType == "node") {
+                        step([$class: "TapPublisher", testResults: "report/test/test.out.tap", outputTapToConsole:false, enableSubtests:true ])
+                        junit keepLongStdio: true, testResults: 'report/junit/*.xml'
+                    }
+                }
             }
         }
     }
