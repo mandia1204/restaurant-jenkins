@@ -20,11 +20,8 @@ def call(Map params) {
                             imageName = "${params.repoName}:${imageTag}"
                             repoUser = params.repoName.split('/')[0];
                             repoAppName = params.repoName.split('/')[1];
-                            if(params.dockerFileName != null){
-                                docker.build(imageName, "-f ${params.dockerFileName} .")
-                            }else{
-                                docker.build(imageName, ".")
-                            }
+                            echo "building image: ${imageName}"
+                            docker.build(imageName, params.dockerFileName == null ? "." :"-f ${params.dockerFileName} .")
                             
                             if(params.appType == "node") {
                                 extractReportFolder buildId:env.BUILD_ID, imageName: imageName
@@ -40,9 +37,12 @@ def call(Map params) {
             }
             stage('Updating image tag and pushing to git repo') {
                 steps {
-                    container('git') {
-                        gitopsPush workspace:env.WORKSPACE, repoUser:repoUser, repoAppName:repoAppName, repoDir:params.repoDir, imageName: imageName
-                    }
+                    // container('git') {
+                    //     gitopsPush workspace:env.WORKSPACE, repoUser:repoUser, repoAppName:repoAppName, repoDir:params.repoDir, imageName: imageName
+                    // }
+                    checkoutGitOps workspace: env.WORKSPACE
+                    patchK8sManifest imageName: imageName, repoDir: params.repoDir
+                    commitChangesAndPush repoAppName:repoAppName, imageName: imageName
                 }
             }
         }
