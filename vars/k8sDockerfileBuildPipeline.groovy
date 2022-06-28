@@ -38,7 +38,7 @@ def call(Map params) {
             stage('Updating image tag and pushing to git repo') {
                 steps {
                     checkoutGitOps workspace: env.WORKSPACE
-                    patchK8sManifest imageName: imageName, repoDir: params.repoDir
+                    patchK8sManifest imageName: imageName, repoDir: params.repoDir, workloadYaml: params.workloadYaml, workloadType: params.workloadType 
                     commitChangesAndPush repoAppName:repoAppName, imageName: imageName
                 }
             }
