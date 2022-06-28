@@ -37,9 +37,6 @@ def call(Map params) {
             }
             stage('Updating image tag and pushing to git repo') {
                 steps {
-                    // container('git') {
-                    //     gitopsPush workspace:env.WORKSPACE, repoUser:repoUser, repoAppName:repoAppName, repoDir:params.repoDir, imageName: imageName
-                    // }
                     checkoutGitOps workspace: env.WORKSPACE
                     patchK8sManifest imageName: imageName, repoDir: params.repoDir
                     commitChangesAndPush repoAppName:repoAppName, imageName: imageName
