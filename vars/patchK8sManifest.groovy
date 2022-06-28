@@ -6,7 +6,9 @@ def call(Map params) {
                 sh "yq -i '.spec.template.spec.containers[0].image = \"${params.imageName}\"' ./${params.repoDir}/${workloadYaml}"
 
                 if(params.workloadType == "job") {
-                    sh "yq -i '.metadata.name = \"${params.imageName}\"' ./${params.repoDir}/${workloadYaml}"
+                    // yourString.replace("\\", "/")
+                    def jobName = params.imageName.replace("/", "-").replace(":", "-")
+                    sh "yq -i '.metadata.name = \"${jobName}\"' ./${params.repoDir}/${workloadYaml}"
                 }
             }
          }                
